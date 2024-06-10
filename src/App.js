@@ -1,7 +1,7 @@
 import './app.css'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {db} from './firestoreTeste'
-import { addDoc, collection, doc, getDocs, updateDoc, deleteDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, getDocs, updateDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
 function App() {
   const [nome, setNome] = useState('')
   const [idade, setIdade] = useState('')
@@ -9,6 +9,29 @@ function App() {
   const [salario, setSalario] = useState('')
   const [users , setUsers] = useState([])
   const [idUser, setidUser] = useState('')
+
+
+useEffect(()=>{
+  async function realTime(){
+    const unsub = onSnapshot(collection(db, "User"), (snapshot) =>{
+      let lista = [] // criando array vazia
+      // criando forEach para percorrer documentos dentro meu snapshot
+      snapshot.forEach((docs)=>{
+        lista.push({
+          id: docs.id,
+          nome: docs.data().nome, // Passando cada informação que quero pegar
+          idade: docs.data().idade,
+          cargo: docs.data().cargo,
+          salario: docs.data().salario,
+
+        })
+      })      
+    setUsers(lista)
+    })
+    
+  }
+  realTime()
+},[])
 
 
   async function cadastrarUser(){
