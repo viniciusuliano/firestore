@@ -1,7 +1,7 @@
 import './app.css'
 import { useState } from 'react';
 import {db} from './firestoreTeste'
-import { addDoc, collection, doc, getDocs, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, getDocs, updateDoc, deleteDoc } from 'firebase/firestore';
 function App() {
   const [nome, setNome] = useState('')
   const [idade, setIdade] = useState('')
@@ -51,7 +51,7 @@ function App() {
 
     })
     .catch((error)=>{
-      alert('ERRO AO REALIZAR BUSCA')
+      alert('ERRO AO REALIZAR BUSCA' + error)
     })
     
   }
@@ -71,6 +71,18 @@ function App() {
       alert('ALGO ESTA ERRADO, DIGITE TODAS AS INFORMAÇÕES PARA EDITAR O USUARIO' + erro)
     })
   }
+
+  async function excluirUser(id){
+    const docRef = doc(db, "User", id);
+    await deleteDoc(docRef)
+    .then(()=>{
+      alert('USUARIO DELETADO COM SUCESSO')
+    })
+    .catch(()=>{
+      alert('ERRO')
+    })
+  }
+
   return (
     <div className='container'>
         <div className='formulario'>
@@ -92,6 +104,7 @@ function App() {
                 <span>Idade: {usuarios.idade}</span><br></br>
                 <span>Cargo: {usuarios.cargo}</span><br></br>
                 <span>Salario: {usuarios.salario}</span><br></br>
+                <button onClick={()=> excluirUser(usuarios.id)}>Excluir</button>
               </li>             
             
             )
