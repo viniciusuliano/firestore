@@ -1,7 +1,8 @@
 import './app.css'
 import { useState, useEffect } from 'react';
-import {db} from './firestoreTeste'
+import {db, auth} from './firestoreTeste'
 import { addDoc, collection, doc, getDocs, updateDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 function App() {
   const [nome, setNome] = useState('')
   const [idade, setIdade] = useState('')
@@ -9,7 +10,8 @@ function App() {
   const [salario, setSalario] = useState('')
   const [users , setUsers] = useState([])
   const [idUser, setidUser] = useState('')
-
+  const [email, setEmail] = useState('')
+  const [senha, setSenha] = useState('')
 
 useEffect(()=>{
   async function realTime(){
@@ -106,8 +108,54 @@ useEffect(()=>{
     })
   }
 
+  async function novoUser(){
+    await createUserWithEmailAndPassword(auth, email, senha)
+    .then(()=>{
+      alert('CADASTRO REALIZADO COM SUCESSO')
+    })
+    .catch((error)=>{
+      if(error.code === 'auth/invalid-email'){
+        alert('Email invalido, digite um email valido')
+      }
+      if(error.code === 'auth/weak-password'){
+        alert('Senha fraca demais, melhore um pouco ela')
+      }
+    })
+  }
+
+  async function loginUser(){
+    await signInWithEmailAndPassword(auth, email, senha)
+    .then(()=>{
+      alert('LOGADO COM SUCESSO')
+    })
+    .catch((error)=>{
+      if(error.code === 'auth/invalid-credential'){
+        alert('SENHA INVALIDA')
+      }
+    })
+  }
+
+  async function singOutUser(){
+    await signOut(auth)
+    .then(()=>{
+      alert('Você deslogou da sua conta!')
+    })
+  }
+
   return (
+  
     <div className='container'>
+        <div className='cadastro'>
+          <h1>Cadastro usuarios TECH NAVE</h1>
+          <label>Email</label><br></br>
+          <input value={email} onChange={(e)=> setEmail(e.target.value)}/><br/>
+          <label>Senha</label><br></br>
+          <input value={senha}  onChange={(e) => setSenha(e.target.value)}/><br></br>
+          <button onClick={novoUser}>Registrar</button>
+          <button onClick={loginUser}>Login</button>
+          <button onClick={singOutUser}>Sair da conta</button>
+        </div>
+
         <div className='formulario'>
         <input type='text' placeholder='Digite o ID do usuario' onChange={(e)=> setidUser(e.target.value)}></input>
         <input type='text' placeholder='Digite seu nome' onChange={(element) => setNome(element.target.value)} required></input>
